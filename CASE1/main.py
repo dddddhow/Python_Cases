@@ -139,6 +139,7 @@ def Sub_func3():
 # Sub_function 2 ============================================================= #
 ''' sigle proc '''
 def single_proc(i_count):
+    time.sleep(5)
     lines= open('3_LIST_of_URLS_of_PDF.txt',encoding='utf-8', errors='ignore').readlines()
     lines_section = open('1_LIST_of_Section.txt',encoding='utf-8', errors='ignore').readlines()
     i_all=len(lines)
@@ -197,7 +198,7 @@ if __name__ == '__main__':
     lines= open('3_LIST_of_URLS_of_PDF.txt',encoding='utf-8', errors='ignore').readlines()
     i_all=len(lines)
     time_start_4=time.time()
-    pool = multiprocessing.Pool(processes=8)
+    pool = multiprocessing.Pool(processes=1)
     for i in range(i_all):
         pool.apply_async(single_proc,(i, ))
     pool.close()

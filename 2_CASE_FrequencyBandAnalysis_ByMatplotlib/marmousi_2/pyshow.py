@@ -1,0 +1,481 @@
+#!/usr/bin/env python3
+import matplotlib.pyplot as plt
+import numpy as np
+import peng.common as p
+import matplotlib.patches as mpatches
+
+#==============================================================================#
+#   Step 1 : 定义参数 & 数据加载                                               #
+#==============================================================================#
+n1=2801*6        #快维采样(point)
+n1_real=2801     #快维采样(point)
+n2=13601         #慢维采样(point)
+nf=5             #频带数目(point)
+d1=1.25          #快维采样间隔(m)
+d2=1.25          #慢维采样间隔(m)
+dt=0.0002        #时间采样间隔(s)
+df=1.0/dt/n1;    #频率采样间隔(Hz)
+
+x=np.linspace(0,n2*d2,n2) #快维变化范围(m)
+z=np.linspace(0,n1*d1,n1) #慢维变化范围(m)
+t=np.linspace(0,n1*dt,n1)  #时间变化范围(s)
+f=np.linspace(0,n1*df,n1)  #频率变化范围(Hz)
+
+dat_ori=p.ReadDat('./dat_in_new.dat',[n1,n2],dtype='float32')
+
+dat_0=p.ReadDat('./data_out_0_2Hz.dat',[n1,n2],dtype='float32')
+# dat_1=p.ReadDat('./data_out_4_8Hz.dat',[n1,n2],dtype='float32')
+dat_1=p.ReadDat('./data_out_4_8Hz.dat_new',[n1,n2],dtype='float32')
+dat_2=p.ReadDat('./data_out_10_59Hz.dat',[n1,n2],dtype='float32')
+dat_3=p.ReadDat('./data_out_61_414Hz.dat',[n1,n2],dtype='float32')
+
+# dat_1_1=p.ReadDat('./data_out_0_9Hz.dat',[n1,n2],dtype='float32')
+# dat_1_2=p.ReadDat('./data_out_0_35Hz.dat',[n1,n2],dtype='float32')
+# dat_1_3=p.ReadDat('./data_out_0_60Hz.dat',[n1,n2],dtype='float32')
+dat_1_1=p.ReadDat('./data_out_1_9Hz.dat',[n1,n2],dtype='float32')
+dat_1_2=p.ReadDat('./data_out_1_35Hz.dat',[n1,n2],dtype='float32')
+dat_1_3=p.ReadDat('./data_out_1_60Hz.dat',[n1,n2],dtype='float32')
+
+cmap='seismic'
+
+dat_f_abs=p.ReadDat('./dat_f_abs.dat',[n1,1],dtype='float32')
+
+loc=int(n2/2)
+com_title='Trace='+str(loc*d2)+'m'
+
+#==============================================================================#
+#   Step 2 : 抽道展示绘图                                                      #
+#==============================================================================#
+
+# # FIgure 0 : 频谱分析
+# plt.figure(figsize=(20,20), constrained_layout=True)
+# plt.grid()
+# plt.plot(f,dat_f_abs,linewidth=2,color='red',label='Frequency Domain')
+# plt.xlim(0, n1_real*df/2)
+# plt.legend(fontsize=20)
+# plt.xlabel('Frequency (Hz)',fontsize=20)
+# plt.ylabel('Amplitude',fontsize=20)
+
+# # FIgure 0 : 频谱分析
+# plt.figure(figsize=(13,20), constrained_layout=True)
+# plt.subplot(3,1,1)
+# plt.imshow(dat_ori[0:n1_real,:],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0))
+# plt.xlabel('Lateral (m)',fontsize=15)
+# plt.ylabel('Depth (m)',fontsize=15)
+# plt.title('Marmousi II',fontsize=15)
+# plt.colorbar(shrink=0.7)
+# plt.subplot(3,1,2)
+# plt.imshow(dat_ori[0:n1_real,:],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0))
+# plt.xlabel('Lateral (m)',fontsize=15)
+# plt.ylabel('Depth (m)',fontsize=15)
+# plt.title('Marmousi II',fontsize=15)
+# plt.colorbar(shrink=0.7)
+# plt.subplot(3,1,3)
+# plt.imshow(dat_ori[0:n1_real,:],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0))
+# plt.xlabel('Lateral (m)',fontsize=20)
+# plt.ylabel('Depth (m)',fontsize=20)
+# plt.title('Marmousi II',fontsize=20)
+# plt.colorbar(shrink=0.7)
+
+# # FIgure 1 : 展示每个单频成分波形
+# plt.figure(figsize=(20,20), constrained_layout=True)
+# plt.grid()
+# plt.plot(z,dat_ori[:,loc],linewidth=4,color='black',label='Impedance : Full band')
+# plt.plot(z,dat_0[:,loc],linewidth=3,label='Impedance : [0Hz,3Hz)')
+# plt.plot(z,dat_1[:,loc],linewidth=3,label='Impedance : [3Hz,8Hz)')
+# plt.plot(z,dat_2[:,loc],linewidth=3,label='Impedance : [8Hz,60Hz)')
+# plt.plot(z,dat_3[:,loc],linewidth=3,label='Impedance : [60,Fmax]')
+# plt.xlim(0, n1_real*d1)
+# plt.legend(fontsize=20)
+# plt.xlabel('Depth (m)',fontsize=20)
+# plt.ylabel('Impedance (kg·m^-2·s^-1)',fontsize=20)
+# plt.title(com_title,fontsize=20)
+
+# # FIgure 2 : 缺失某一频率时的波形
+# plt.figure(figsize=(20,20), constrained_layout=True)
+# plt.grid()
+# plt.plot(z,dat_ori[:,loc],linewidth=4,color='black',label='Full_Band Impedance')
+# plt.plot(z,dat_ori[:,loc]-dat_0[:,loc],linewidth=3,label='Impedance,[0Hz,3Hz) missing')
+# plt.plot(z,dat_ori[:,loc]-dat_1[:,loc],linewidth=3,label='Impedance,[3Hz,8Hz) missing')
+# plt.plot(z,dat_ori[:,loc]-dat_2[:,loc],linewidth=3,label='Impedance,[8Hz,60Hz) missing')
+# plt.plot(z,dat_ori[:,loc]-dat_3[:,loc],linewidth=3,label='Impedance,[60Hz,MaxHz] missing')
+# plt.xlim(0, n1_real*d1)
+# plt.legend(fontsize=20)
+# plt.xlabel('Depth (m)',fontsize=20)
+# plt.ylabel('Impedance (kg·m^-2·s^-1)',fontsize=20)
+# plt.title(com_title,fontsize=20)
+
+# # Figure 3-6 : 针对单个频率缺失进行绘图
+# # FIgure 3 : 缺失0-2Hz
+# # FIgure 4 : 缺失3-8Hz
+# # FIgure 5 : 缺失9-60Hz
+# # FIgure 6 : 缺失30-120Hz
+# plt.figure(figsize=(20,20), constrained_layout=True)
+# plt.grid()
+# plt.plot(z,dat_ori[:,loc],linewidth=4,color='black',label='Impedance : Full band')
+# plt.plot(z,dat_ori[:,loc]-dat_0[:,loc],linewidth=3,color='red',label='Impedance : Full band but 0-3Hz missing')
+# plt.plot(z,dat_0[:,loc],linewidth=3,linestyle='--' ,label='Impedance : The missing 0-3Hz')
+# plt.xlim(0, n1_real*d1)
+# plt.legend(fontsize=20)
+# plt.xlabel('Depth (m)',fontsize=20)
+# plt.ylabel('Impedance (kg·m^-2·s^-1)',fontsize=20)
+# plt.title(com_title,fontsize=20)
+
+# plt.figure(figsize=(20,20), constrained_layout=True)
+# plt.grid()
+# plt.plot(z,dat_ori[:,loc],linewidth=4,color='black',label='Impedance : Full band')
+# plt.plot(z,dat_ori[:,loc]-dat_1[:,loc],linewidth=3,color='red',label='Impedance : Full band but 3-8Hz missing')
+# plt.plot(z,dat_1[:,loc],linewidth=3,linestyle='--' ,label='Impedance : The missing 3-8Hz')
+# plt.xlim(0, n1_real*d1)
+# plt.legend(fontsize=20)
+# plt.xlabel('Depth (m)',fontsize=20)
+# plt.ylabel('Impedance (kg·m^-2·s^-1)',fontsize=20)
+# plt.title(com_title,fontsize=20)
+
+# plt.figure(figsize=(20,20), constrained_layout=True)
+# plt.grid()
+# plt.plot(z,dat_ori[:,loc],linewidth=4,color='black',label='Impedance : Full band')
+# plt.plot(z,dat_ori[:,loc]-dat_2[:,loc],linewidth=3,color='red',label='Impedance : Full band but 8-60Hz missing')
+# plt.plot(z,dat_2[:,loc],linewidth=3,linestyle='--' ,label='Impedance : The missing 8-60Hz Impedance')
+# plt.xlim(0, n1_real*d1)
+# plt.legend(fontsize=20)
+# plt.xlabel('Depth (m)',fontsize=20)
+# plt.ylabel('Impedance (kg·m^-2·s^-1)',fontsize=20)
+# plt.title(com_title,fontsize=20)
+
+# plt.figure(figsize=(20,20), constrained_layout=True)
+# plt.grid()
+# plt.plot(z,dat_ori[:,loc],linewidth=4,color='black',label='Impedance : Full band')
+# plt.plot(z,dat_ori[:,loc]-dat_3[:,loc],linewidth=3,color='red',label='Impedance : Full band but 60-MaxHz missing')
+# plt.plot(z,dat_3[:,loc],linewidth=3,linestyle='--' ,label='Impedance : The missing 60-MaxHz')
+# plt.xlim(0, n1_real*d1)
+# plt.legend(fontsize=20)
+# plt.xlabel('Depth (m)',fontsize=20)
+# plt.ylabel('Impedance (kg·m^-2·s^-1)',fontsize=20)
+# plt.title(com_title,fontsize=20)
+
+# #==============================================================================#
+# #   Step 3 : 剖面展示绘图                                                      #
+# #==============================================================================#
+
+# # Figure 7 : 不同频率带宽成分剖面绘制
+# plt.figure(figsize=(18,8))
+# plt.subplot(2,2,1)
+# plt.imshow(dat_0[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0))
+# plt.xlabel('Lateral (m)',fontsize=10)
+# plt.ylabel('Depth (m)',fontsize=10)
+# plt.title('Impedance : [0Hz,3Hz)',fontsize=20)
+# plt.colorbar(orientation='horizontal',shrink=0.75)
+# plt.subplot(2,2,2)
+# plt.imshow(dat_1[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0))
+# plt.xlabel('Lateral (m)',fontsize=10)
+# plt.ylabel('Depth (m)',fontsize=10)
+# plt.title('Impedance : [3Hz,8Hz)',fontsize=20)
+# plt.colorbar(orientation='horizontal',shrink=0.75)
+# plt.subplot(2,2,3)
+# plt.imshow(dat_2[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0),vmin=0)
+# plt.xlabel('Lateral (m)',fontsize=10)
+# plt.ylabel('Depth (m)',fontsize=10)
+# plt.title('Impedance : [8Hz,60Hz)',fontsize=20)
+# plt.colorbar(orientation='horizontal',shrink=0.75)
+# plt.subplot(2,2,4)
+# plt.imshow(dat_3[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0),vmin=0,vmax=2e6)
+# plt.xlabel('Lateral (m)',fontsize=10)
+# plt.ylabel('Depth (m)',fontsize=10)
+# plt.title('Impedance : [60Hz,MaxHz]',fontsize=20)
+# plt.colorbar(orientation='horizontal',shrink=0.75)
+# plt.subplots_adjust(wspace=0.15, hspace=0.05)
+
+# # Figure 8-11 : 缺失不同频率带宽成分剖面绘制
+# # Figure 8 : 缺失0-2Hz
+# # Figure 9 : 缺失3-8Hz
+# # Figure 10: 缺失9-60Hz
+# # Figure 11: 缺失61-120Hz
+# plt.figure(figsize=(13,20), constrained_layout=True)
+# plt.subplot(3,1,1)
+# plt.imshow(dat_ori[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0))
+# plt.xlabel('Lateral (m)',fontsize=15)
+# plt.ylabel('Depth (m)',fontsize=15)
+# plt.title('Impedance : Full band',fontsize=15)
+# plt.colorbar(shrink=0.7)
+# plt.subplot(3,1,2)
+# plt.imshow(dat_ori[0:n1_real,0:n2]-dat_0[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0))
+# plt.xlabel('Lateral (m)',fontsize=15)
+# plt.ylabel('Depth (m)',fontsize=15)
+# plt.title('Impedance : [0Hz,3Hz) missing',fontsize=15)
+# plt.colorbar(shrink=0.7)
+# plt.subplot(3,1,3)
+# plt.imshow(dat_0[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0))
+# plt.xlabel('Lateral (m)',fontsize=15)
+# plt.ylabel('Depth (m)',fontsize=15)
+# plt.title('Impedance : The missing [0Hz,3Hz)',fontsize=15)
+# plt.colorbar(shrink=0.7)
+
+# plt.figure(figsize=(13,20), constrained_layout=True)
+# plt.subplot(3,1,1)
+# im=plt.imshow(dat_ori[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0))
+# plt.xlabel('Lateral (m)',fontsize=15)
+# plt.ylabel('Depth (m)',fontsize=15)
+# plt.title('Impedance : Full band',fontsize=15)
+# plt.colorbar(shrink=0.7)
+# plt.subplot(3,1,2)
+# im=plt.imshow(dat_ori[0:n1_real,0:n2]-dat_1[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0))
+# plt.xlabel('Lateral (m)',fontsize=15)
+# plt.ylabel('Depth (m)',fontsize=15)
+# plt.title('Impedance : [3Hz,8Hz) missing',fontsize=15)
+# plt.colorbar(shrink=0.7)
+# plt.subplot(3,1,3)
+# im=plt.imshow(dat_1[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0))
+# plt.xlabel('Lateral (m)',fontsize=15)
+# plt.ylabel('Depth (m)',fontsize=15)
+# plt.title('Impedance : The missing [3Hz,8Hz)',fontsize=15)
+# plt.colorbar(shrink=0.7)
+
+# plt.figure(figsize=(13,20), constrained_layout=True)
+# plt.subplot(3,1,1)
+# im=plt.imshow(dat_ori[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0))
+# plt.xlabel('Lateral (m)',fontsize=15)
+# plt.ylabel('Depth (m)',fontsize=15)
+# plt.title('Impedance : Full band',fontsize=15)
+# plt.colorbar(shrink=0.7)
+# plt.subplot(3,1,2)
+# im=plt.imshow(dat_ori[0:n1_real,0:n2]-dat_2[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0))
+# plt.xlabel('Lateral (m)',fontsize=15)
+# plt.ylabel('Depth (m)',fontsize=15)
+# plt.title('Impedance : [8Hz,60Hz) missing',fontsize=15)
+# plt.colorbar(shrink=0.7)
+# plt.subplot(3,1,3)
+# im=plt.imshow(dat_2[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0))
+# plt.xlabel('Lateral (m)',fontsize=15)
+# plt.ylabel('Depth (m)',fontsize=15)
+# plt.title('Impedance : The missing [8Hz,60Hz)',fontsize=15)
+# plt.colorbar(shrink=0.7)
+
+# plt.figure(figsize=(13,20), constrained_layout=True)
+# plt.subplot(3,1,1)
+# im=plt.imshow(dat_ori[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0))
+# plt.xlabel('Lateral (m)',fontsize=15)
+# plt.ylabel('Depth (m)',fontsize=15)
+# plt.title('Impedance : Full band',fontsize=15)
+# plt.colorbar(shrink=0.7)
+# plt.subplot(3,1,2)
+# im=plt.imshow(dat_ori[0:n1_real,0:n2]-dat_3[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0))
+# plt.xlabel('Lateral (m)',fontsize=15)
+# plt.ylabel('Depth (m)',fontsize=15)
+# plt.title('Impedance : [60Hz,MaxHz] missing',fontsize=15)
+# plt.colorbar(shrink=0.7)
+# plt.subplot(3,1,3)
+# im=plt.imshow(dat_3[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0),vmin=0,vmax=3e6)
+# plt.xlabel('Lateral (m)',fontsize=15)
+# plt.ylabel('Depth (m)',fontsize=15)
+# plt.title('Impedance : The missing [60Hz,MaxHz]',fontsize=15)
+# plt.colorbar(shrink=0.7)
+
+#==============================================================================#
+# Step 4 : 王老师要求图片                                                      #
+#==============================================================================#
+# 1.1
+plt.figure(figsize=(13,20), constrained_layout=True)
+plt.subplot(3,1,1)
+im=plt.imshow(dat_1_1[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0),vmin=0,vmax=1e7)
+plt.xlabel('Lateral (m)',fontsize=15)
+plt.ylabel('Depth (m)',fontsize=15)
+plt.title('Impedance : 0-9Hz',fontsize=15)
+plt.colorbar(shrink=0.7)
+plt.subplot(3,1,2)
+im=plt.imshow(dat_1_1[0:n1_real,0:n2]-dat_1[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0),vmin=0,vmax=1e7)
+plt.xlabel('Lateral (m)',fontsize=15)
+plt.ylabel('Depth (m)',fontsize=15)
+plt.title('Impedance : 0-9Hz but missing 3-8Hz',fontsize=15)
+plt.colorbar(shrink=0.7)
+plt.subplot(3,1,3)
+im=plt.imshow(dat_1[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0),vmin=0,vmax=1e7)
+plt.xlabel('Lateral (m)',fontsize=15)
+plt.ylabel('Depth (m)',fontsize=15)
+plt.title('Impedance : The missing 3-8Hz',fontsize=15)
+plt.colorbar(shrink=0.7)
+
+# 1.2
+loc=int(n2/4)
+com_title='Trace='+str(loc*d2)+'m'
+plt.figure(figsize=(20,20), constrained_layout=True)
+plt.grid()
+plt.plot(z,dat_ori[:,loc],linewidth=4,color='black',label='Impedance, Full_Band')
+plt.plot(z,dat_1_1[:,loc],linewidth=3,label='Impedance, 0-9Hz')
+plt.plot(z,dat_1_1[:,loc]-dat_1[:,loc],linewidth=3,label='Impedance, 0-9Hz but missing 3-8Hz',color='red')
+plt.plot(z,dat_1[:,loc],linewidth=3,linestyle='--',label='Impedance, The missing 3-8Hz')
+plt.xlim(0, n1_real*d1)
+plt.legend(fontsize=15)
+plt.xlabel('Depth (m)',fontsize=15)
+plt.ylabel('Impedance (kg·m^-2·s^-1)',fontsize=15)
+plt.title(com_title,fontsize=15)
+
+loc=int(n2/2)
+com_title='Trace='+str(loc*d2)+'m'
+plt.figure(figsize=(20,20), constrained_layout=True)
+plt.grid()
+plt.plot(z,dat_ori[:,loc],linewidth=4,color='black',label='Impedance, Full_Band')
+plt.plot(z,dat_1_1[:,loc],linewidth=3,label='Impedance, 0-9Hz')
+plt.plot(z,dat_1_1[:,loc]-dat_1[:,loc],linewidth=3,label='Impedance, 0-9Hz but missing 3-8Hz',color='red')
+plt.plot(z,dat_1[:,loc],linewidth=3,linestyle='--',label='Impedance, The missing 3-8Hz')
+plt.xlim(0, n1_real*d1)
+plt.legend(fontsize=15)
+plt.xlabel('Depth (m)',fontsize=15)
+plt.ylabel('Impedance (kg·m^-2·s^-1)',fontsize=15)
+plt.title(com_title,fontsize=15)
+
+
+loc=int(n2/4*3)
+com_title='Trace='+str(loc*d2)+'m'
+plt.figure(figsize=(20,20), constrained_layout=True)
+plt.grid()
+plt.plot(z,dat_ori[:,loc],linewidth=4,color='black',label='Impedance, Full_Band')
+plt.plot(z,dat_1_1[:,loc],linewidth=3,label='Impedance, 0-9Hz')
+plt.plot(z,dat_1_1[:,loc]-dat_1[:,loc],linewidth=3,label='Impedance, 0-9Hz but missing 3-8Hz',color='red')
+plt.plot(z,dat_1[:,loc],linewidth=3,linestyle='--',label='Impedance, The missing 3-8Hz')
+plt.xlim(0, n1_real*d1)
+plt.legend(fontsize=15)
+plt.xlabel('Depth (m)',fontsize=15)
+plt.ylabel('Impedance (kg·m^-2·s^-1)',fontsize=15)
+plt.title(com_title,fontsize=15)
+loc=int(n2/2)
+com_title='Trace='+str(loc*d2)+'m'
+
+
+
+
+# 2.1
+plt.figure(figsize=(13,20), constrained_layout=True)
+plt.subplot(3,1,1)
+im=plt.imshow(dat_1_1[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0),vmin=0,vmax=1e7)
+plt.xlabel('Lateral (m)',fontsize=15)
+plt.ylabel('Depth (m)',fontsize=15)
+plt.title('Impedance : 0-35Hz',fontsize=15)
+plt.colorbar(shrink=0.7)
+plt.subplot(3,1,2)
+im=plt.imshow(dat_1_2[0:n1_real,0:n2]-dat_1[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0),vmin=0,vmax=1e7)
+plt.xlabel('Lateral (m)',fontsize=15)
+plt.ylabel('Depth (m)',fontsize=15)
+plt.title('Impedance : 0-35Hz but missing 3-8Hz',fontsize=15)
+plt.colorbar(shrink=0.7)
+plt.subplot(3,1,3)
+im=plt.imshow(dat_1[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0),vmin=0,vmax=1e7)
+plt.xlabel('Lateral (m)',fontsize=15)
+plt.ylabel('Depth (m)',fontsize=15)
+plt.title('Impedance : The missing 3-8Hz',fontsize=15)
+plt.colorbar(shrink=0.7)
+
+# 2.2
+loc=int(n2/2)
+com_title='Trace='+str(loc*d2)+'m'
+plt.figure(figsize=(20,20), constrained_layout=True)
+plt.grid()
+plt.plot(z,dat_ori[:,loc],linewidth=4,color='black',label='Impedance, Full_Band')
+plt.plot(z,dat_1_2[:,loc],linewidth=3,label='Impedance, 0-35Hz')
+plt.plot(z,dat_1_2[:,loc]-dat_1[:,loc],linewidth=3,label='Impedance, 0-35Hz but missing 3-8Hz',color='red')
+plt.plot(z,dat_1[:,loc],linewidth=3,linestyle='--',label='Impedance, The missing 3-8Hz')
+plt.xlim(0, n1_real*d1)
+plt.legend(fontsize=15)
+plt.xlabel('Depth (m)',fontsize=15)
+plt.ylabel('Impedance (kg·m^-2·s^-1)',fontsize=15)
+plt.title(com_title,fontsize=15)
+
+loc=int(n2/4)
+com_title='Trace='+str(loc*d2)+'m'
+plt.figure(figsize=(20,20), constrained_layout=True)
+plt.grid()
+plt.plot(z,dat_ori[:,loc],linewidth=4,color='black',label='Impedance, Full_Band')
+plt.plot(z,dat_1_2[:,loc],linewidth=3,label='Impedance, 0-35Hz')
+plt.plot(z,dat_1_2[:,loc]-dat_1[:,loc],linewidth=3,label='Impedance, 0-35Hz but missing 3-8Hz',color='red')
+plt.plot(z,dat_1[:,loc],linewidth=3,linestyle='--',label='Impedance, The missing 3-8Hz')
+plt.xlim(0, n1_real*d1)
+plt.legend(fontsize=15)
+plt.xlabel('Depth (m)',fontsize=15)
+plt.ylabel('Impedance (kg·m^-2·s^-1)',fontsize=15)
+plt.title(com_title,fontsize=15)
+
+loc=int(n2/4*3)
+com_title='Trace='+str(loc*d2)+'m'
+plt.figure(figsize=(20,20), constrained_layout=True)
+plt.grid()
+plt.plot(z,dat_ori[:,loc],linewidth=4,color='black',label='Impedance, Full_Band')
+plt.plot(z,dat_1_2[:,loc],linewidth=3,label='Impedance, 0-35Hz')
+plt.plot(z,dat_1_2[:,loc]-dat_1[:,loc],linewidth=3,label='Impedance, 0-35Hz but missing 3-8Hz',color='red')
+plt.plot(z,dat_1[:,loc],linewidth=3,linestyle='--',label='Impedance, The missing 3-8Hz')
+plt.xlim(0, n1_real*d1)
+plt.legend(fontsize=15)
+plt.xlabel('Depth (m)',fontsize=15)
+plt.ylabel('Impedance (kg·m^-2·s^-1)',fontsize=15)
+plt.title(com_title,fontsize=15)
+loc=int(n2/2)
+com_title='Trace='+str(loc*d2)+'m'
+
+
+
+# 3.1
+plt.figure(figsize=(13,20), constrained_layout=True)
+plt.subplot(3,1,1)
+im=plt.imshow(dat_1_1[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0),vmin=0,vmax=1e7)
+plt.xlabel('Lateral (m)',fontsize=15)
+plt.ylabel('Depth (m)',fontsize=15)
+plt.title('Impedance : 0-60Hz',fontsize=15)
+plt.colorbar(shrink=0.7)
+plt.subplot(3,1,2)
+im=plt.imshow(dat_1_3[0:n1_real,0:n2]-dat_1[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0),vmin=0,vmax=1e7)
+plt.xlabel('Lateral (m)',fontsize=15)
+plt.ylabel('Depth (m)',fontsize=15)
+plt.title('Impedance : 0-60Hz but missing 3-8Hz',fontsize=15)
+plt.colorbar(shrink=0.7)
+plt.subplot(3,1,3)
+im=plt.imshow(dat_1[0:n1_real,0:n2],cmap=cmap,extent=(0,n2*d2,n1_real*d1,0),vmin=0,vmax=1e7)
+plt.xlabel('Lateral (m)',fontsize=15)
+plt.ylabel('Depth (m)',fontsize=15)
+plt.title('Impedance : The missing 3-8Hz',fontsize=15)
+plt.colorbar(shrink=0.7)
+
+# 2.2
+loc=int(n2/4)
+com_title='Trace='+str(loc*d2)+'m'
+plt.figure(figsize=(20,20), constrained_layout=True)
+plt.grid()
+plt.plot(z,dat_ori[:,loc],linewidth=4,color='black',label='Impedance, Full_Band')
+plt.plot(z,dat_1_3[:,loc],linewidth=3,label='Impedance, 0-60Hz')
+plt.plot(z,dat_1_3[:,loc]-dat_1[:,loc],linewidth=3,label='Impedance, 0-60Hz but missing 3-8Hz',color='red')
+plt.plot(z,dat_1[:,loc],linewidth=3,linestyle='--',label='Impedance, The missing 3-8Hz')
+plt.xlim(0, n1_real*d1)
+plt.legend(fontsize=15)
+plt.xlabel('Depth (m)',fontsize=15)
+plt.ylabel('Impedance (kg·m^-2·s^-1)',fontsize=15)
+plt.title(com_title,fontsize=15)
+
+loc=int(n2/2)
+com_title='Trace='+str(loc*d2)+'m'
+plt.figure(figsize=(20,20), constrained_layout=True)
+plt.grid()
+plt.plot(z,dat_ori[:,loc],linewidth=4,color='black',label='Impedance, Full_Band')
+plt.plot(z,dat_1_3[:,loc],linewidth=3,label='Impedance, 0-60Hz')
+plt.plot(z,dat_1_3[:,loc]-dat_1[:,loc],linewidth=3,label='Impedance, 0-60Hz but missing 3-8Hz',color='red')
+plt.plot(z,dat_1[:,loc],linewidth=3,linestyle='--',label='Impedance, The missing 3-8Hz')
+plt.xlim(0, n1_real*d1)
+plt.legend(fontsize=15)
+plt.xlabel('Depth (m)',fontsize=15)
+plt.ylabel('Impedance (kg·m^-2·s^-1)',fontsize=15)
+plt.title(com_title,fontsize=15)
+
+loc=int(n2/4*3)
+com_title='Trace='+str(loc*d2)+'m'
+plt.figure(figsize=(20,20), constrained_layout=True)
+plt.grid()
+plt.plot(z,dat_ori[:,loc],linewidth=4,color='black',label='Impedance, Full_Band')
+plt.plot(z,dat_1_3[:,loc],linewidth=3,label='Impedance, 0-60Hz')
+plt.plot(z,dat_1_3[:,loc]-dat_1[:,loc],linewidth=3,label='Impedance, 0-60Hz but missing 3-8Hz',color='red')
+plt.plot(z,dat_1[:,loc],linewidth=3,linestyle='--',label='Impedance, The missing 3-8Hz')
+plt.xlim(0, n1_real*d1)
+plt.legend(fontsize=15)
+plt.xlabel('Depth (m)',fontsize=15)
+plt.ylabel('Impedance (kg·m^-2·s^-1)',fontsize=15)
+plt.title(com_title,fontsize=15)
+
+
+#==============================================================================#
+plt.show()
